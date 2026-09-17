@@ -1,0 +1,32 @@
+{
+  "name": "executable-stories-demo-awaitly",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "STORY_REPORT=1 vitest run",
+    "test:coverage": "vitest run --coverage.enabled --coverage.include='src/rob/**'",
+    "mutation": "stryker run",
+    "mutation:incremental": "stryker run --incremental",
+    "demo:reset": "cp src/rob/index.test.ts.before src/rob/index.test.ts",
+    "dev": "bun --hot scripts/dev.ts",
+    "diagram": "awaitly-analyze ./src/awaitly.test.ts",
+    "diagram:watch": "awaitly-analyze ./src/awaitly.test.ts --watch",
+    "diagram:html": "awaitly-analyze ./src/awaitly.test.ts --html"
+  },
+  "devDependencies": {
+    "@stryker-mutator/core": "10.0.0",
+    "@stryker-mutator/vitest-runner": "10.0.0",
+    "@types/bun": "latest",
+    "@vitest/coverage-v8": "5.0.1",
+    "executable-stories-formatters": "1.20.0",
+    "executable-stories-vitest": "8.9.5",
+    "live-server": "1.2.2",
+    "typescript": "7.0.2",
+    "vitest": "^5.0.1"
+  },
+  "dependencies": {
+    "awaitly": "6.2.0",
+    "awaitly-analyze": "0.31.2",
+    "eslint-plugin-awaitly": "4.1.0"
+  }
+}

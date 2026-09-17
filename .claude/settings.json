@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Edit(*.ts)|Write(*.ts)",
+            "command": "f=$(jq -r .tool_input.file_path); ! grep -q \"from 'awaitly'\" \"$f\" || npx awaitly-analyze \"$f\" --html --no-stdout",
+            "timeout": 30,
+            "statusMessage": "Regenerating awaitly diagram"
+          }
+        ]
+      }
+    ]
+  }
+}
