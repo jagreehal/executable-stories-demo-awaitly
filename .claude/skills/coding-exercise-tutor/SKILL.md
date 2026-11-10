@@ -17,7 +17,7 @@ just receive the answer. Solve it with strict red → green TDD, express every s
 executable story so the HTML report becomes the tutorial, and narrate as a really good
 teacher would: picture first, then numbers, then the trap.
 
-Three ideas drive everything below:
+Four ideas drive everything below:
 
 - **tdd** — one vertical slice at a time; a failing test before any code; expected
   values from the spec, never recomputed from the implementation.
@@ -26,25 +26,53 @@ Three ideas drive everything below:
 - **teach** — ELI5. One idea per scenario. The HTML is the lesson a stranger reads
   without the chat. Explain *why* before *what*. Ask a prediction in chat; answer it
   in the report, in numbers, in the next sentence.
+- **storage, not fluency** — watching a solution feel obvious is not learning it.
+  Effortful recall is. End every exercise with something the learner must retrieve
+  or build themselves, with automatic feedback (a test going green).
+
+## Learner record
+
+`coding-exercises-main/LEARNER.md` carries what this person already knows across
+exercises. Read it before planning; create it lazily the first time there is
+something worth writing. One line per entry, newest last:
+
+```md
+- 2026-11-10 goal: interview prep — dwell on planning out loud and naming trade-offs
+- 2026-11-10 fruit-machine: knows injecting randomness; got pot-includes-stake wrong at first
+- 2026-11-12 connect4: said "I already know TDD basics" — skip red/green explanations
+```
+
+Write an entry only for evidence, not coverage: the user stated prior knowledge,
+answered a check correctly, or had a misconception corrected. A topic you only
+covered doesn't count. Use it to pitch the next exercise: skip what's known, and
+re-test old misconceptions in the check-yourself questions.
 
 ## Layout
 
-```
-coding-exercises-main/<slug>/README.md        the spec (read it first, cite it)
-src/exercises/<slug>/<slug>.ts                the implementation (starts as a stub)
-src/exercises/<slug>/<slug>.story.test.ts     the lesson: one story per slice
-reports/<slug>.html                           generated on every test run
+```text
+coding-exercises-main/<slug>/README.md   the spec (read it first, cite it)
+<test file>                              the lesson: one story per slice
+<impl file>                              next to the test file; starts as a stub
 ```
 
-Run one exercise's tests with `pnpm test src/exercises/<slug>` — that is
-`STORY_REPORT=1 vitest run`, so the reporter regenerates the HTML every time. Run it
-after **every** red and **every** green; a step that wasn't run is a claim, not a lesson.
+Use the test file the user names. The repo README's prompts name
+`src/coding-exercise.test.ts`. If they don't name one, use that file. Where the HTML
+lands is decided by `vitest.config.ts`: `src/coding-exercise.test.ts` is routed to
+`reports/coding-exercise.html`. Any other path falls back to the default colocated
+name. Read the config to find the report path, but don't edit it.
+
+Run the tests with `pnpm test <test file>`. That runs `STORY_REPORT=1 vitest run`,
+so the reporter regenerates the HTML every time. Run it after **every** red and
+**every** green; a step that wasn't run is a claim, not a lesson.
 
 ## The flow
 
 ### 1. Understand and plan out loud
 
-Read the README. Then, in chat:
+Read the README and `LEARNER.md` (if it exists). If it isn't obvious why they're
+doing this exercise (interview prep, learning TDD, learning the language), ask once,
+because the answer decides what to dwell on. If nobody answers, assume they're
+learning TDD and say so. Then, in chat:
 
 - Restate the problem in two or three plain sentences a non-programmer could repeat.
 - Name the **public functions** the tests will drive (e.g. `createMachine(float)`,
@@ -68,14 +96,14 @@ report has a narrative header and a glossary, and the stub throws so the first t
 is honestly red:
 
 ```ts
-// src/exercises/<slug>/<slug>.ts
+// src/<slug>.ts (next to the test file)
 export const play = (): never => {
   throw new Error('TODO: implement play');
 };
 ```
 
 ```ts
-// src/exercises/<slug>/<slug>.story.test.ts
+// src/coding-exercise.test.ts (or the file the user named)
 import { describe, expect, it } from 'vitest';
 import { story } from 'executable-stories-vitest';
 import { play } from './<slug>';
@@ -97,7 +125,9 @@ describe('<Exercise name>', () => {
 
 Every domain word in the README (`float`, `stake`, `jackpot`, `free play`, …) gets a
 glossary entry. The report links them wherever they appear. Definitions hold no
-implementation detail.
+implementation detail. Define what the term *is* in one or two sentences. When the
+README uses two words for one thing (`stake` / `play cost`), pick one, use only that
+one in every story, and mention the alias in the definition.
 
 ### 3. Loop: one slice at a time
 
@@ -108,13 +138,17 @@ and what the reader should predict ("Before we run it: you put £1 into a machin
 already has £10. Four greens. How much do you walk away with?"). Keep it to what's
 needed for *this* slice.
 
-**b. Write the story test.** One `it()`, `story.init(task, { covers: ['src/exercises/<slug>/<slug>.ts'] })`,
+**b. Write the story test.** One `it()`, `story.init(task, { covers: ['<impl file>'] })`,
 `given`/`when`/`then` that read as the requirement, and the teaching captured as doc
-entries sitting next to the step they explain:
+entries sitting next to the step they explain. Put each `expect` straight after the
+step it proves. The reporter marks the last step declared before a failing `expect`
+as red, so if every expect sits at the end, the wrong step gets the blame. Give each
+expect a message (`expect(x, 'why this matters')`). Vitest puts it at the front of
+the failure, so a red explains itself.
 
 ```ts
 it('a play moves the play cost from the player to the machine', ({ task }) => {
-  story.init(task, { covers: ['src/exercises/fruit-machine/fruit-machine.ts'] });
+  story.init(task, { covers: ['src/fruit-machine.ts'] });
 
   story.section({
     title: 'Why start here',
@@ -138,7 +172,9 @@ if you lose.
   const after = play(machine, player, spin);
 
   story.then('the player has £4');
+  expect(after.player.money, 'the play cost leaves the player').toBe(400);
   story.and('the machine has £11');
+  expect(after.machine.money, 'a losing spin keeps the pound in the pot').toBe(1100);
   story.table({
     label: 'Where the pound went',
     columns: ['Who', 'Before', 'After'],
@@ -151,8 +187,6 @@ if you lose.
     'You put £1 in. The pot is now £11. The colours do not win, so the machine keeps the pound. ' +
       'You walk away with £4.',
   );
-  expect(after.player.money).toBe(400);
-  expect(after.machine.money).toBe(1100);
 });
 ```
 
@@ -168,6 +202,7 @@ Pick the doc kind that *is* the lesson, not all of them:
 | `story.and` / `story.but` | An extra outcome (`and the machine is empty`, `but they keep their money`). |
 | `story.code` | Only when a 3-line idea *is* the lesson. |
 | `story.mermaid` | Only when there is a real yes/no branch (can the pot pay this prize?). |
+| `story.link` | At most once per exercise, on the slice where the core idea lands, and only if a source teaches that idea (e.g. LifeWiki for Game of Life). Skip it rather than link to decoration. |
 | Inline docs | `story.given('…', { note: '…' })` so teaching sits on the step, not in a lecture before Given. |
 
 Expected values come from the README's worked examples or a hand calculation — never
@@ -183,7 +218,7 @@ Skip the rest of the kitchen-sink API. `story.json` object dumps, `story.html`,
 `story.video`, `story.custom`, `story.attach`, `story.attachSpans`, and
 `tag` / `ticket` / `meta` do not teach.
 
-**c. Run → red.** `pnpm test src/exercises/<slug>`. Quote the failure and say what it
+**c. Run → red.** `pnpm test <test file>`. Quote the failure and say what it
 tells us (a `TODO` throw means "no behaviour yet"; a wrong number means "the rule is
 wrong, not the plumbing"). If it's green already, something is off — the test isn't
 testing the new behaviour. Fix the test, not the code.
@@ -203,11 +238,32 @@ blocked by the current shape, and say so.
 
 ### 4. Wrap up
 
-- Run the full file one last time; every story green, stretch goals as `it.todo`.
+- **Your turn.** Choose one remaining slice the learner can just about manage: one
+  step past what they've seen, not two. Write its story test in full (Given/When/
+  Then, the teaching prose, and expected values from the spec) and mark it
+  `it.skip`. The test is their feedback loop, so don't implement it. When unlocked
+  it must go red for a reason that teaches: the error should say what's wrong, not
+  just `false !== true`. An `it.skip` body never runs, so nothing inside it reaches
+  the report. That's why the next bullet names the challenge in a story that does
+  run. Any other stretch goals stay as `it.todo`.
+- **Check yourself.** A doc entry only reaches the report from inside a running
+  test, so add a last `it('check yourself', ({ task }) => { story.init(task); story.section(…) })`
+  with no `expect`. Its only job is to carry the section. Give it 2–3 recall questions about
+  this exercise's ideas (the trap, why randomness is injected, a hand calculation
+  with new numbers). Put the answers below the questions, under an "Answers"
+  heading. Open the section with "Answer these before you scroll down". For multiple choice, make every option the same length, change which
+  position holds the right answer, and don't let formatting give it away. Re-ask
+  any misconception from `LEARNER.md` that fits. End the section with the your-turn
+  challenge: its test name, and the instruction "change `it.skip` to `it`, run
+  `pnpm test <test file>`, make it green".
+- Run the full file one last time; every story green (the your-turn story skipped).
 - In chat: a table of slices (behaviour → test name → status), the two or three ideas
-  that mattered most, and what the reader could try next on their own.
-- Tell them where the report is (`reports/<slug>.html`) and open it with
-  `open reports/<slug>.html`.
+  that mattered most, the your-turn challenge, and a reminder that they can ask
+  follow-up questions about anything unclear.
+- Update `LEARNER.md` if this session produced evidence (see above). Always record
+  their stated goal. If nothing qualifies, skip it.
+- Tell them where the report is (e.g. `reports/coding-exercise.html`) and open it
+  with `open <report>`. If `open` is blocked, just give the path.
 
 ## Voice
 
@@ -225,14 +281,14 @@ the idea in kid words. Chat may use them; the HTML may not.
 
 Bad (a pairing note the learner has to decode):
 
-```
+```text
 Hand calculation: machine 1000 + 100 stake = 1100. Jackpot pays 1100.
 Player 500 − 100 + 1100 = 1500. Machine 0.
 ```
 
 Good:
 
-```
+```text
 You put £1 in. The pot is now £11. Four greens means you get the whole pot.
 You walk away with £15. The machine is empty.
 
@@ -280,5 +336,5 @@ Good:
   implementation — pass a `random` / `spin` function so tests choose the outcome.
   Explain this in kid words when it first appears; it's usually the most useful
   lesson in the exercise.
-- Don't touch `vitest.config.ts` or the reporter setup; the routing for
-  `src/exercises/**` already exists.
+- Don't touch `vitest.config.ts` or the reporter setup. Read it to find where the
+  report lands (see Layout).

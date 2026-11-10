@@ -4,7 +4,7 @@
     {
       "id": 0,
       "prompt": "Complete the game-of-life coding exercise in coding-exercises-main/game-of-life using executable-stories, and teach me how you solved it as you go. Tasks 1-3 and the edge-handling are the core; skip the animation task.",
-      "expected_output": "src/exercises/game-of-life/{game-of-life.ts, game-of-life.story.test.ts}, all stories green, reports/game-of-life.html regenerated, narration that reads as a TDD tutorial (seams, ordered slices, red then green per slice, prediction questions, wrap-up).",
+      "expected_output": "src/coding-exercise.test.ts plus src/game-of-life.ts, all stories green (your-turn story skipped), reports/coding-exercise.html regenerated, narration that reads as a TDD tutorial (seams, ordered slices, red then green per slice, prediction questions, wrap-up).",
       "files": ["coding-exercises-main/game-of-life/README.md"],
       "assertions": [
         "Each of the four README rules (under-population, survival with 2-3, overcrowding >3, birth with exactly 3) has its own scenario whose title or steps name the rule",
@@ -21,18 +21,20 @@
         "narration.md shows a failing (red) test run result before the corresponding passing (green) run for at least 3 separate slices",
         "narration.md contains at least one prediction question posed to the learner before a result is revealed (e.g. Before we run it ... what do you expect)",
         "narration.md ends with a wrap-up: a table or list of slices with status, and key takeaways",
-        "No assertion in the test file is tautological (expected values are literals or hand-worked from the README, never recomputed by calling the implementation or the same formula)"
+        "No assertion in the test file is tautological (expected values are literals or hand-worked from the README, never recomputed by calling the implementation or the same formula)",
+        "Exactly one fully written your-turn story is marked it.skip, and the implementation does not yet satisfy it",
+        "A final 'check yourself' story carries a story.section with 2-3 recall questions, an Answers heading, and the your-turn instruction (change it.skip to it, run the tests)"
       ]
     },
     {
       "id": 1,
       "prompt": "Can you work through coding-exercises-main/split-the-treasure for me? I want to actually understand the approach, not just get code.",
-      "expected_output": "src/exercises/split-the-treasure/{split-the-treasure.ts, split-the-treasure.story.test.ts}, all stories green, reports/split-the-treasure.html, tutorial-style narration with prediction questions and per-slice takeaways.",
+      "expected_output": "src/coding-exercise.test.ts plus src/split-the-treasure.ts, all stories green (your-turn story skipped), reports/coding-exercise.html regenerated, tutorial-style narration with prediction questions and per-slice takeaways.",
       "files": ["coding-exercises-main/split-the-treasure/README.md"],
       "assertions": [
         "All four README example chests appear as scenarios with the README's stated outcomes: [4,4,4] splits 3 ways; [27,7,20] splits 2 ways only; [6,3,2,4,1] splits 2 ways but not 3 or 4; [3,2,7,7,14,5,3,4,9,2] splits 4 ways",
         "The solution returns HOW the treasure is split (the groups), not only whether it can be, as the README asks",
-        "The bonus question ([3,3,3,3,2,2,2,2,2,2,2,2] between four seekers) is addressed either as a passing scenario or an explicit it.todo with the reasoning",
+        "The bonus question ([3,3,3,3,2,2,2,2,2,2,2,2] between four seekers) is addressed as a passing scenario, the your-turn it.skip, or an explicit it.todo with the reasoning",
         "Every it() in the story test file calls story.init(task) with the task argument",
         "All tests in the exercise story file pass (test runner exit 0, zero failures)",
         "An HTML report for the exercise was produced by the StoryReporter (an .html file in outputs/ containing the scenario titles)",
@@ -44,7 +46,9 @@
         "narration.md shows a failing (red) test run result before the corresponding passing (green) run for at least 3 separate slices",
         "narration.md contains at least one prediction question posed to the learner before a result is revealed (e.g. Before we run it ... what do you expect)",
         "narration.md ends with a wrap-up: a table or list of slices with status, and key takeaways",
-        "No assertion in the test file is tautological (expected values are literals or hand-worked from the README, never recomputed by calling the implementation or the same formula)"
+        "No assertion in the test file is tautological (expected values are literals or hand-worked from the README, never recomputed by calling the implementation or the same formula)",
+        "Exactly one fully written your-turn story is marked it.skip, and the implementation does not yet satisfy it",
+        "A final 'check yourself' story carries a story.section with 2-3 recall questions, an Answers heading, and the your-turn instruction (change it.skip to it, run the tests)"
       ]
     }
   ]
