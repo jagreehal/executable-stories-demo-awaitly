@@ -261,7 +261,7 @@ blocked by the current shape, and say so.
   that mattered most, the your-turn challenge, and a reminder that they can ask
   follow-up questions about anything unclear.
 - Update `LEARNER.md` if this session produced evidence (see above). Always record
-  their stated goal. If nothing qualifies, skip it.
+  a goal the learner stated; an assumed goal is not recorded. If nothing qualifies, skip it.
 - Tell them where the report is (e.g. `reports/coding-exercise.html`) and open it
   with `open <report>`. If `open` is blocked, just give the path.
 
